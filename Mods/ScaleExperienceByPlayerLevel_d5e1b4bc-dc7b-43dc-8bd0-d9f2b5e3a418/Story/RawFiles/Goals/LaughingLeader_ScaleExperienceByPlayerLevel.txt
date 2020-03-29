@@ -1,0 +1,88 @@
+Version 1
+SubGoalCombiner SGC_AND
+INITSECTION
+KBSECTION
+
+/*
+==================
+  Settings Flags
+==================
+LLXPSCALE_DisableDeathExperience
+	Characters don't grant xp on death.
+
+LLXPSCALE_IgnoreEnemyAlignment
+	Allies/neutral characters that die also grant xp to parties.
+
+LLXPSCALE_AlwaysScaleToPlayerLevel
+	Lower level enemy death xp will be scaled up to the player's level.
+*/
+
+//REGION QUERIES
+QRY
+LLXPSCALE_QRY_IsHostileToPlayer((CHARACTERGUID)_Char)
+AND
+GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignment", 0)
+AND
+DB_IsPlayer(_Player)
+AND
+CharacterIsEnemy(_Char, _Player, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_IsHostileToPlayer((CHARACTERGUID)_Char)
+AND
+GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignment", 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_CharacterIsValid((CHARACTERGUID)_Char)
+AND
+CharacterIsPlayer(_Char, 0)
+AND
+CharacterIsPartyFollower(_Char, 0)
+AND
+CharacterIsSummon(_Char, 0)
+AND
+IsTagged(_Char, "TOTEM", 0)
+AND
+IsTagged(_Char, "LeaderLib_Dummy", 0)
+AND
+IsTagged(_Char, "LEADERLIB_IGNORE", 0)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_CanGrantExperience((CHARACTERGUID)_Char)
+AND
+NRD_CharacterGetInt(_Char, "Resurrected", 0) // Never resurrected
+AND
+GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled", 0)
+AND
+LLXPSCALE_QRY_CharacterIsValid(_Char)
+AND
+LLXPSCALE_QRY_IsHostileToPlayer(_Char)
+THEN
+DB_NOOP(1);
+//END_REGION 
+
+//REGION DEATH_EVENT
+IF
+CharacterDied(_Char)
+AND
+LLXPSCALE_QRY_CanGrantExperience(_Char)
+THEN
+LLXPSCALE_GrantPartyExperience(_Char);
+//END_REGION
+
+//REGION DEBUG
+IF
+TextEventSet("llxpscale_luareset")
+THEN
+NRD_LuaReset(1,1,1);
+//END_REGION
+
+EXITSECTION
+ENDEXITSECTION
+ParentTargetEdge "__Start"

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<save>
+    <header version="2" />
+    <version major="3" minor="6" revision="6" build="0" />
+    <region id="MetaData">
+        <node id="root">
+            <attribute id="Module" value="d5e1b4bc-dc7b-43dc-8bd0-d9f2b5e3a418" type="23" />
+            <attribute id="Name" value="ScaleExperienceByPlayerLevel" type="23" />
+            <attribute id="Type" value="Add-on" type="23" />
+            <attribute id="UUID" value="39ef29e7-9f40-4813-98c3-ea3ffdc7a2e7" type="23" />
+        </node>
+    </region>
+</save>
