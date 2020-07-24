@@ -1,9 +1,16 @@
 ---@param key string
 ---@param fallback number
+---@param toInt boolean
 ---@return number
-local function GetExtraDataValue(key, fallback)
+local function GetExtraDataValue(key, fallback, toInt)
 	local val = Ext.ExtraData[key]
-	if val ~= nil then return val end
+	if val ~= nil then
+		if toInt == true then
+			return math.tointeger(val)
+		else
+			return val
+		end
+	end
 	return fallback
 end
 
@@ -41,6 +48,7 @@ function LLXPSCALE_Ext_GetScaledExperience(gain, level)
 end
 
 local function LLXPSCALE_Client_InitializeModule()
+	--- Disables default Gain scaling.
 	Ext.StatSetLevelScaling("Character", "Gain", function(gain,level) return 0 end)
 	Ext.Print("[LLXPSCALE:BootstrapClient.lua:LLXPSCALE_ModuleLoading] Registered Gain scale override function.")
 end

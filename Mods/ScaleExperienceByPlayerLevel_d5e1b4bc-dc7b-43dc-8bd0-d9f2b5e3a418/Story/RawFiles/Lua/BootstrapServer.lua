@@ -107,7 +107,9 @@ local function BuildPartyStructure(printDebug)
 	return partyLeaders,highestLevel
 end
 
-local function LLXPSCALE_GrantPartyExperience(char)
+---@param char string The UUID of the character that died.
+---@param attacker string|nil Attacker's UUID, if any.
+function GrantPartyExperience(char, attacker)
 	local stats = nil
 	local character = Ext.GetCharacter(char)
 	if character ~= nil then
@@ -116,7 +118,12 @@ local function LLXPSCALE_GrantPartyExperience(char)
 	if stats == nil then stats = GetStatString(char) end
 	if stats ~= nil then
 		local printDebug = Ext.IsDeveloperMode()
-		local gain = NRD_StatGetInt(stats, "Gain")
+		local gain = Ext.StatGetAttribute(stats, "Gain")
+		if gain == "None" then 
+			gain = 0 
+		else
+			gain = tonumber(gain)
+		end
 
 		if gain > 0 then
 			local enemyLevel = CharacterGetLevel(char)
@@ -141,6 +148,7 @@ local function LLXPSCALE_GrantPartyExperience(char)
 					if printDebug then
 						Ext.Print("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting xp to party of (" .. tostring(leader) ..") scaled to level ("..tostring(highestLevel).."). ")
 					end
+					ObjectSetFlag(char, "LLXPSCALE_GrantedExperience", 0)
 					return true
 				end
 			end
@@ -152,6 +160,3 @@ local function LLXPSCALE_GrantPartyExperience(char)
 	end
 	return false
 end
-
-Ext.NewCall(LLXPSCALE_GrantPartyExperience, "LLXPSCALE_GrantPartyExperience", "(CHARACTERGUID)_Character")
---Ext.NewQuery(LLXPSCALE_GrantPartyExperience, "LLXPSCALE_GrantPartyExperience", "[in](CHARACTERGUID)_Character")

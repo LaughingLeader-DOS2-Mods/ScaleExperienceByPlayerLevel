@@ -37,6 +37,26 @@ THEN
 DB_NOOP(1);
 
 QRY
+LLXPSCALE_QRY_IsHostileToPlayer((CHARACTERGUID)_Char, (INTEGER)_CombatID)
+AND
+GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignment", 0)
+AND
+DB_IsPlayer(_Player)
+AND
+DB_CombatCharacters(_Player, _CombatID)
+AND
+CharacterIsEnemy(_Char, _Player, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_IsHostileToPlayer((CHARACTERGUID)_Char, (INTEGER)_CombatID)
+AND
+GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignment", 1)
+THEN
+DB_NOOP(1);
+
+QRY
 LLXPSCALE_QRY_CharacterIsValid((CHARACTERGUID)_Char)
 AND
 CharacterIsPlayer(_Char, 0)
@@ -56,13 +76,37 @@ DB_NOOP(1);
 QRY
 LLXPSCALE_QRY_CanGrantExperience((CHARACTERGUID)_Char)
 AND
+IsTagged(_Char, "LLXPSCALE_DisableDeathExperience", 0)
+AND
+ObjectGetFlag(_Char, "LLXPSCALE_GrantedExperience", 0)
+AND
 NRD_CharacterGetInt(_Char, "Resurrected", 0) // Never resurrected
 AND
 GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled", 0)
 AND
 LLXPSCALE_QRY_CharacterIsValid(_Char)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_CharacterIsPlayerRelated((CHARACTERGUID)_Char)
 AND
-LLXPSCALE_QRY_IsHostileToPlayer(_Char)
+CharacterIsPlayer(_Char, _a)
+AND
+CharacterIsPartyFollower(_Char, _b)
+AND
+IntegerMax(_a, _b, 1)
+THEN
+DB_NOOP(1);
+
+QRY
+LLXPSCALE_QRY_CharacterIsPlayerRelated((CHARACTERGUID)_Char)
+AND
+CharacterIsSummon(_Char, 1)
+AND
+CharacterGetOwner(_Char, _Owner)
+AND
+CharacterIsPlayer(_Owner, 1)
 THEN
 DB_NOOP(1);
 //END_REGION 
@@ -72,15 +116,45 @@ IF
 CharacterDied(_Char)
 AND
 LLXPSCALE_QRY_CanGrantExperience(_Char)
+AND
+DB_CombatCharacters(_Char, _CombatID)
+AND
+LLXPSCALE_QRY_IsHostileToPlayer(_Char, _CombatID)
+AND
+GetUUID(_Char, _UUID)
 THEN
-LLXPSCALE_GrantPartyExperience(_Char);
-//END_REGION
+NRD_ModCall("LLXPSCALE", "GrantPartyExperience", _UUID);
 
-//REGION DEBUG
 IF
-TextEventSet("llxpscale_luareset")
+CharacterKilledBy(_Char, _Attacker, _)
+AND
+NOT DB_CombatCharacters(_Char, _)
+AND
+NOT DB_CombatCharacters(_Attacker, _)
+AND
+LLXPSCALE_QRY_CharacterIsPlayerRelated(_Attacker)
+AND
+LLXPSCALE_QRY_CanGrantExperience(_Char)
+AND
+GetUUID(_Char, _UUID)
+AND
+GetUUID(_Attacker, _AttackerUUID)
 THEN
-NRD_LuaReset(1,1,1);
+NRD_ModCall("LLXPSCALE", "GrantPartyExperience", _UUID, _AttackerUUID);
+
+// Killed a non-enemy NPC outside of combat (one-shot, so combat did not have a chance to start)
+PROC
+ProcCrimeCreateMurder(_Attacker, _Char, _CrimeID)
+AND
+LLXPSCALE_QRY_CharacterIsPlayerRelated(_Attacker)
+AND
+LLXPSCALE_QRY_CanGrantExperience(_Char)
+AND
+GetUUID(_Char, _UUID)
+AND
+GetUUID(_Attacker, _AttackerUUID)
+THEN
+NRD_ModCall("LLXPSCALE", "GrantPartyExperience", _UUID, _AttackerUUID);
 //END_REGION
 
 EXITSECTION

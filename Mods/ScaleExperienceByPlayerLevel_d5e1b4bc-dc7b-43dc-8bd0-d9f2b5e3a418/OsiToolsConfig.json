@@ -1,5 +1,6 @@
 {
-    "RequiredExtensionVersion": 42,
+    "RequiredExtensionVersion": 49,
+    "ModTable": "LLXPSCALE",
     "FeatureFlags": [
         "OsirisExtensions",
         "Lua",
