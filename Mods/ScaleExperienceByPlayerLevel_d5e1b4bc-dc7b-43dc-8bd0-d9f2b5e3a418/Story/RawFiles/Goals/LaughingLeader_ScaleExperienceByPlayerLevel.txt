@@ -3,6 +3,17 @@ SubGoalCombiner SGC_AND
 INITSECTION
 KBSECTION
 
+// [BEGIN_NO_OSITOOLS]
+IF
+GameStarted(_Region, _)
+AND
+IsGameLevel(_Region, 1)
+AND
+CharacterGetHostCharacter(_Host)
+THEN
+OpenMessageBox(_Host, "LLSCALEXP_MissingScriptExtender");
+// [END_NO_OSITOOLS]
+
 /*
 ==================
   Settings Flags
@@ -112,6 +123,7 @@ DB_NOOP(1);
 //END_REGION 
 
 //REGION DEATH_EVENT
+/* [OSITOOLS_ONLY]
 IF
 CharacterDied(_Char)
 AND
@@ -155,6 +167,7 @@ AND
 GetUUID(_Attacker, _AttackerUUID)
 THEN
 NRD_ModCall("LLXPSCALE", "GrantPartyExperience", _UUID, _AttackerUUID);
+*/
 //END_REGION
 
 EXITSECTION
