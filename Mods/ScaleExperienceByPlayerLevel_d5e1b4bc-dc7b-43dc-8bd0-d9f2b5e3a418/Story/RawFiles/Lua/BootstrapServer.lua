@@ -188,9 +188,8 @@ end
 
 ---@param character EsvCharacter
 local function CanGrantExperience(character, skipAlignmentCheck)
-	--print(GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 0, not character:HasTag("NO_RECORD"), not character:HasTag("LLXPSCALE_DisableDeathExperience"), ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0, not character.Resurrected, not character.IsPlayer, not character.Summon, not character:HasTag("TOTEM"), not character.PartyFollower, not character:HasTag("LeaderLib_Dummy"), not character:HasTag("LEADERLIB_IGNORE"), (skipAlignmentCheck == true or IsHostileToPlayer(character)))
 	return GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 0
-	and not character:HasTag("NO_RECORD") -- Is a corpse?
+	and not character:HasTag("NO_RECORD") -- A corpse?
 	and not character:HasTag("LLXPSCALE_DisableDeathExperience")
 	and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0
 	and not character.Resurrected
