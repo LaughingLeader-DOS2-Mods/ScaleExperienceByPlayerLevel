@@ -1,6 +1,6 @@
 Key	Content	Handle
 LLXPSCALE_DeathExperienceDisabled	Enable Death Experience	h6d2d607cgcc5cg486egb395g53f51095eac1
-LLXPSCALE_DeathExperienceDisabled_Description	Characters who have never been resurrected before will grant experience when they die. Disable this to effectively disable this mod.
+LLXPSCALE_DeathExperienceDisabled_Description	Characters who have never been resurrected before will grant experience when they die. Disable this to effectively disable this mod.	h85a1e79bg59f0g4b8fga6begca12641a342b
 LLXPSCALE_IgnoreEnemyAlignmentEnabled	Check Enemy Alignments	h1d90a48bgf934g40bdg89e8gf727baf1ca26
 LLXPSCALE_IgnoreEnemyAlignmentEnabled_Description	If disabled, dying characters will grant xp regardless if they're "Evil" or not.	h1b4e0b43g5a88g4818g9a41gbd57e74e2191
 LLXPSCALE_AlwaysScaleToPlayerLevelEnabled	Always Scale to Player Level	h935865a5g9f0eg475ag85bdg699df269f8d7
