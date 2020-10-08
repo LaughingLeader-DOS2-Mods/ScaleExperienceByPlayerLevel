@@ -1,0 +1,23 @@
+{
+	"Data": {
+		"Flags": [
+			{
+				"Type" : "Global",
+				"Entries" : [
+					"LLXPSCALE_DeathExperienceDisabled",
+					"LLXPSCALE_IgnoreEnemyAlignmentEnabled",
+					"LLXPSCALE_AlwaysScaleToPlayerLevelEnabled"
+				]
+			}
+		]
+	},
+	"MenuOrder": [
+		{
+			"Entries" : [
+				"LLXPSCALE_DeathExperienceDisabled",
+				"LLXPSCALE_IgnoreEnemyAlignmentEnabled",
+				"LLXPSCALE_AlwaysScaleToPlayerLevelEnabled"
+			]
+		}
+	]
+}

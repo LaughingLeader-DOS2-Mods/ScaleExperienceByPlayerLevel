@@ -14,7 +14,9 @@ local function GetExtraDataValue(key, fallback, toInt)
 	return fallback
 end
 
-function LLXPSCALE_Ext_GetScaledExperience(gain, level)
+
+-- UNUSED
+local function LLXPSCALE_Ext_GetScaledExperience(gain, level)
 	local levelCap = math.floor(GetExtraDataValue("LevelCap", 35))
 	if gain ~= nil and gain > 0 then
 		if Ext.IsDeveloperMode() then Ext.Print("[LLXPSCALE:BootstrapClient.lua:GetScaledExperience] gain(" .. tostring(gain) .. ") level(" .. tostring(level) .. "/".. tostring(levelCap) ..")") end

@@ -1,10 +1,9 @@
 {
-    "RequiredExtensionVersion": 49,
+    "RequiredExtensionVersion": 52,
     "ModTable": "LLXPSCALE",
     "FeatureFlags": [
         "OsirisExtensions",
         "Lua",
-        "Preprocessor",
-        "FormulaOverrides"
+        "Preprocessor"
     ]
 }
