@@ -115,6 +115,7 @@ end
 
 ---@param character EsvCharacter
 function GrantPartyExperience(character, printDebug)
+	ObjectSetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience", 0)
 	--print("GrantPartyExperience", character.MyGuid, character.Stats.Name)
 	local gain = Ext.StatGetAttribute(character.Stats.Name, "Gain") or 0
 	if gain == "None" then
@@ -145,7 +146,6 @@ function GrantPartyExperience(character, printDebug)
 				if printDebug then
 					printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting xp to party of (" .. tostring(leader) ..") scaled to level ("..tostring(highestLevel).."). ")
 				end
-				ObjectSetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience", 0)
 				return true
 			end
 		end
@@ -207,6 +207,9 @@ local function CanGrantExperience(character, skipAlignmentCheck)
 	and CharacterIsPartyFollower(character.MyGuid) == 0
 	and not character:HasTag("LeaderLib_Dummy")
 	and not character:HasTag("LEADERLIB_IGNORE")
+	and (character.RootTemplate ~= nil and character.RootTemplate.DefaultState == 0) -- Dead is > 0
+	--and not string.find(character.DisplayName, "Dead")
+	--and not string.find(character.DisplayName, "Corpse")
 	and (skipAlignmentCheck == true or IsHostileToPlayer(character))
 end
 
