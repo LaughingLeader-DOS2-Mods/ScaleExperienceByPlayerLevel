@@ -129,12 +129,14 @@ function GrantPartyExperience(character, printDebug)
 			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (" .. tostring(gain) ..") gain. ")
 		end
 		if GlobalGetFlag("LLXPSCALE_AlwaysScaleToPlayerLevelEnabled") == 0 then
-			for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
-				local plevel = CharacterGetLevel(v[1])
-				if plevel > enemyLevel then
-					enemyLevel = plevel
+			pcall(function()
+				for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
+					local plevel = CharacterGetLevel(v[1])
+					if plevel > enemyLevel then
+						enemyLevel = plevel
+					end
 				end
-			end
+			end)
 		end
 		--local partyStructure,highestLevel = BuildPartyStructure()
 		local leader = CharacterGetHostCharacter()
