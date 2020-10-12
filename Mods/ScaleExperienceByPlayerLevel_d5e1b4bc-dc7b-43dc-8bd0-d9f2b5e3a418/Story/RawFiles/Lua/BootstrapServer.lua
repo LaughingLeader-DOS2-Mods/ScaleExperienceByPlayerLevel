@@ -115,14 +115,13 @@ end
 
 ---@param character EsvCharacter
 function GrantPartyExperience(character, printDebug)
-	print("GrantPartyExperience", character.Stats.Name)
+	--print("GrantPartyExperience", character.MyGuid, character.Stats.Name)
 	local gain = Ext.StatGetAttribute(character.Stats.Name, "Gain") or 0
 	if gain == "None" then
 		gain = 0
 	elseif gain ~= 0 then
 		gain = tonumber(gain)
 	end
-	print(gain)
 	if gain > 0 then
 		local enemyLevel = character.Stats.Level
 		if printDebug then
@@ -186,6 +185,13 @@ local function IsHostileToPlayer(character)
 	return false
 end
 
+Ext.RegisterOsirisListener("CharacterStatusApplied", 3, "after", function(char, status, source)
+	if status == "SUMMONING" then
+		local character = Ext.GetCharacter(char)
+		print(character.Summon, character.Stats.IsPlayer, character.IsPlayer, CharacterIsSummon(character.MyGuid))
+	end
+end)
+
 ---@param character EsvCharacter
 local function CanGrantExperience(character, skipAlignmentCheck)
 	return GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 0
@@ -193,9 +199,12 @@ local function CanGrantExperience(character, skipAlignmentCheck)
 	and not character:HasTag("LLXPSCALE_DisableDeathExperience")
 	and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0
 	and not character.Resurrected
-	and not character.IsPlayer
-	and not character.Summon
-	and not character.PartyFollower
+	--and not character.IsPlayer
+	and CharacterIsPlayer(character.MyGuid) == 0
+	--and not character.Summon
+	and CharacterIsSummon(character.MyGuid) == 0
+	--and not character.PartyFollower
+	and CharacterIsPartyFollower(character.MyGuid) == 0
 	and not character:HasTag("LeaderLib_Dummy")
 	and not character:HasTag("LEADERLIB_IGNORE")
 	and (skipAlignmentCheck == true or IsHostileToPlayer(character))
