@@ -128,27 +128,17 @@ function GrantPartyExperience(character, printDebug)
 		if printDebug then
 			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (" .. tostring(gain) ..") gain. ")
 		end
-		local partyStructure,highestLevel = BuildPartyStructure()
-		if GlobalGetFlag("LLXPSCALE_AlwaysScaleToPlayerLevelEnabled") == 0 and enemyLevel < highestLevel then
-			if printDebug then
-				printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] NPC level is lower than party level. Using NPC level for xp scaling. (" .. tostring(highestLevel) .." => "..tostring(enemyLevel)..")")
-			end
-			highestLevel = enemyLevel
-		end
-		if type(partyStructure) == "string" then
-			PartyAddExperience(partyStructure, 1, highestLevel, gain)
-			if printDebug then
-				printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting xp to sole player (" .. tostring(partyStructure) ..") scaled to level ("..tostring(highestLevel).."). ")
-			end
-		else
-			for leader,members in pairs(partyStructure) do
-				PartyAddExperience(leader, 1, highestLevel, gain)
-				if printDebug then
-					printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting xp to party of (" .. tostring(leader) ..") scaled to level ("..tostring(highestLevel).."). ")
+		if GlobalGetFlag("LLXPSCALE_AlwaysScaleToPlayerLevelEnabled") == 0 then
+			for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
+				local plevel = CharacterGetLevel(v[1])
+				if plevel > enemyLevel then
+					enemyLevel = plevel
 				end
-				return true
 			end
 		end
+		--local partyStructure,highestLevel = BuildPartyStructure()
+		local leader = CharacterGetHostCharacter()
+		PartyAddExperience(leader, 1, enemyLevel, gain)
 	else
 		if printDebug then
 			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Skipping experience for (" .. tostring(char) ..") since Gain is 0. ")
