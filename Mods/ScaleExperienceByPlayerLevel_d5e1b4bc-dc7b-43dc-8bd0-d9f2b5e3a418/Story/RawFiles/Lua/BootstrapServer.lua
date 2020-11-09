@@ -163,6 +163,13 @@ local function IsInCombatWithPlayer(character, attackOwner)
 	return false
 end
 
+-- Ext.RegisterOsirisListener("CharacterStatusApplied", 3, "after", function(char, status, source)
+-- 	if status == "SUMMONING" then
+-- 		local character = Ext.GetCharacter(char)
+-- 		print(character.Summon, character.Stats.IsPlayer, character.IsPlayer, CharacterIsSummon(character.MyGuid))
+-- 	end
+-- end)
+
 ---@param character EsvCharacter
 local function IsHostileToPlayer(character)
 	local faction = GetFaction(character.MyGuid) or ""
@@ -176,13 +183,6 @@ local function IsHostileToPlayer(character)
 	end
 	return false
 end
-
-Ext.RegisterOsirisListener("CharacterStatusApplied", 3, "after", function(char, status, source)
-	if status == "SUMMONING" then
-		local character = Ext.GetCharacter(char)
-		print(character.Summon, character.Stats.IsPlayer, character.IsPlayer, CharacterIsSummon(character.MyGuid))
-	end
-end)
 
 ---@param character EsvCharacter
 local function CanGrantExperience(character, skipAlignmentCheck)
