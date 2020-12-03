@@ -55,10 +55,8 @@ local function DumpTable(o, indexMap, innerOnly, recursionLevel)
 	end
 end
 
-local function printd(...)
-	if Ext.IsDeveloperMode() then
-		Ext.Print(...)
-	end
+local function printd(msg, ...)
+	Ext.Print(string.format(msg, ...))
 end
 
 local function BuildPartyStructure(printDebug)
@@ -113,6 +111,18 @@ local function BuildPartyStructure(printDebug)
 	return partyLeaders,highestLevel
 end
 
+---@return integer
+local function GetPartyLevel()
+	local level = 1
+	for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
+		local plevel = CharacterGetLevel(v[1])
+		if plevel > level then
+			level = plevel
+		end
+	end
+	return level
+end
+
 ---@param character EsvCharacter
 function GrantPartyExperience(character, printDebug)
 	ObjectSetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience", 0)
@@ -124,26 +134,26 @@ function GrantPartyExperience(character, printDebug)
 		gain = tonumber(gain)
 	end
 	if gain > 0 then
-		local enemyLevel = character.Stats.Level
+		local xpLevel = character.Stats.Level
+		local scaleLowerLevels = GlobalGetFlag("LLXPSCALE_AlwaysScaleToPlayerLevelEnabled") == 1
+
+		local plevel = GetPartyLevel()
+		if plevel < xpLevel then
+			xpLevel = plevel
+		elseif scaleLowerLevels and xpLevel < plevel then
+			xpLevel = plevel
+		end
+
 		if printDebug then
-			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (" .. tostring(gain) ..") gain. ")
+			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (%s) Gain at level (%s).", gain, xpLevel)
 		end
-		if GlobalGetFlag("LLXPSCALE_AlwaysScaleToPlayerLevelEnabled") == 0 then
-			pcall(function()
-				for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
-					local plevel = CharacterGetLevel(v[1])
-					if plevel > enemyLevel then
-						enemyLevel = plevel
-					end
-				end
-			end)
-		end
+
 		--local partyStructure,highestLevel = BuildPartyStructure()
 		local leader = CharacterGetHostCharacter()
-		PartyAddExperience(leader, 1, enemyLevel, gain)
+		PartyAddExperience(leader, 1, xpLevel, gain)
 	else
 		if printDebug then
-			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Skipping experience for (" .. tostring(char) ..") since Gain is 0. ")
+			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Skipping experience for %s since Gain is 0.", character.MyGuid)
 		end
 	end
 	return false
@@ -223,11 +233,13 @@ Ext.RegisterOsirisListener("CharacterDied", 1, "after", function(char)
 	end
 end)
 
+local isDebugMode = Ext.IsDeveloperMode() == true
+
 Ext.RegisterOsirisListener("CharacterKilledBy", 3, "after", function(victim, attackOwner, attacker)
 	if isGameLevel and Ext.GetGameState() == "Running" then
 		local character = Ext.GetCharacter(victim)
 		if character ~= nil and CanGrantExperience(character, true) and IsInCombatWithPlayer(character, attackOwner) then
-			local b,err = xpcall(GrantPartyExperience, debug.traceback, character)
+			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, isDebugMode)
 			if not b then
 				Ext.PrintError(err)
 			end
