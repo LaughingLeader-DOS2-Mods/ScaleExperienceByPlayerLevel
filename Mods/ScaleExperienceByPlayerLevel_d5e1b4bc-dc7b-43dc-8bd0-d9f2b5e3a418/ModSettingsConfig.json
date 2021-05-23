@@ -10,14 +10,26 @@
 					"LLXPSCALE_AlwaysScaleToPlayerLevelEnabled"
 				]
 			}
-		]
+		],
+		"Variables": {
+			"NamePrefix" : "LLXPSCALE_Variable_",
+			"Entries" : {
+				"GainModifier" : {
+					"Max" : 3.0,
+					"Min" : 0.0,
+					"Value": 1.0,
+					"Increment": 0.1
+				}
+			}
+		}
 	},
 	"MenuOrder": [
 		{
 			"Entries" : [
 				"LLXPSCALE_DeathExperienceDisabled",
 				"LLXPSCALE_IgnoreEnemyAlignmentEnabled",
-				"LLXPSCALE_AlwaysScaleToPlayerLevelEnabled"
+				"LLXPSCALE_AlwaysScaleToPlayerLevelEnabled",
+				"GainModifier"
 			]
 		}
 	]

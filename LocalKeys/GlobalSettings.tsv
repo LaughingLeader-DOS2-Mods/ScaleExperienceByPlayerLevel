@@ -1,7 +1,9 @@
 Key	Content	Handle
 LLXPSCALE_DeathExperienceDisabled	Enable Death Experience	h6d2d607cgcc5cg486egb395g53f51095eac1
 LLXPSCALE_DeathExperienceDisabled_Description	Characters who have never been resurrected before will grant experience when they die. Disable this to effectively disable this mod.<br>(Default: Enabled)	h85a1e79bg59f0g4b8fga6begca12641a342b
-LLXPSCALE_IgnoreEnemyAlignmentEnabled	Check Enemy Alignments	h1d90a48bgf934g40bdg89e8gf727baf1ca26
-LLXPSCALE_IgnoreEnemyAlignmentEnabled_Description	If disabled, dying characters will grant xp regardless of their alignment, meaning killing a neutral character immediately will grant experience.<br>(Default: Disabled)	h1b4e0b43g5a88g4818g9a41gbd57e74e2191
+LLXPSCALE_IgnoreEnemyAlignmentEnabled	Ignore Alignments	h1d90a48bgf934g40bdg89e8gf727baf1ca26
+LLXPSCALE_IgnoreEnemyAlignmentEnabled_Description	If enabled, dying characters will grant xp regardless of their alignment, meaning killing a neutral character immediately will grant experience.<br>(Default: Disabled)	h1b4e0b43g5a88g4818g9a41gbd57e74e2191
 LLXPSCALE_AlwaysScaleToPlayerLevelEnabled	Always Scale to Player Level	h935865a5g9f0eg475ag85bdg699df269f8d7
 LLXPSCALE_AlwaysScaleToPlayerLevelEnabled_Description	By default, if an enemy level is lower than the party's level, xp will scale to that enemy's level. If this is disabled, the level used will always be the party's highest level.<br>(Default: Disabled)	he3e5bbe3g8009g4a33g9558gffcbe3d0107a
+LLXPSCALE_Variable_GainModifier	Gain Modifier	h6a30a1a3gced7g4033gaf36g1e2826cc78b6
+LLXPSCALE_Variable_GainModifier_Description	A number to multiply experience gain by. The average gain value may be anywhere from 1-3, and this number needs to be an integer, so 50% of 1 isn't a valid number, and will be rounded up to 1 instead.<br>(Default: 1) 	h2837a69bgf20cg4080g81d2g51b5b5d65371
