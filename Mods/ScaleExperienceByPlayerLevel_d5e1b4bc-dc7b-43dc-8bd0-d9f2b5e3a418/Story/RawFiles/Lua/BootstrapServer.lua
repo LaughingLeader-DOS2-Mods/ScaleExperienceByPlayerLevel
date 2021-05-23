@@ -116,7 +116,7 @@ local function GetPartyLevel()
 	local level = 1
 	for i,v in pairs(Osi.DB_IsPlayer:Get(nil)) do
 		local plevel = CharacterGetLevel(v[1])
-		if plevel > level then
+		if plevel and plevel > level then
 			level = plevel
 		end
 	end
@@ -132,6 +132,15 @@ function GrantPartyExperience(character, printDebug)
 		gain = 0
 	elseif gain ~= 0 then
 		gain = tonumber(gain)
+	end
+	if Mods.LeaderLib then
+		local settings = Mods.LeaderLib.SettingsManager.GetMod("d5e1b4bc-dc7b-43dc-8bd0-d9f2b5e3a418", false)
+		if settings then
+			local gainModifier = settings.Global:GetVariable("GainModifier", 1.0)
+			if gainModifier ~= 1.0 then
+				gain = Ext.Round((gain * gainModifier) + 0.25)
+			end
+		end
 	end
 	if gain > 0 then
 		local xpLevel = character.Stats.Level
@@ -183,7 +192,7 @@ end
 ---@param character EsvCharacter
 local function IsHostileToPlayer(character)
 	local faction = GetFaction(character.MyGuid) or ""
-	if string.find(faction, "Evil") or GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignmentEnabled") == 0 then
+	if string.find(faction, "Evil") or GlobalGetFlag("LLXPSCALE_IgnoreEnemyAlignmentEnabled") == 1 then
 		return true
 	end
 	for i,db in pairs(Osi.DB_IsPlayer:Get(nil)) do
@@ -216,6 +225,7 @@ local function CanGrantExperience(character, skipAlignmentCheck)
 end
 
 local isGameLevel = true
+local isDebugMode = Ext.IsDeveloperMode() == true
 
 Ext.RegisterOsirisListener("GameStarted", 2, "after", function(region, _)
 	isGameLevel = IsGameLevel(region) == 1
@@ -225,15 +235,15 @@ Ext.RegisterOsirisListener("CharacterDied", 1, "after", function(char)
 	if isGameLevel and Ext.GetGameState() == "Running" then
 		local character = Ext.GetCharacter(char)
 		if character ~= nil and CanGrantExperience(character) then
-			local b,err = xpcall(GrantPartyExperience, debug.traceback, character)
+			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, isDebugMode)
 			if not b then
 				Ext.PrintError(err)
 			end
+		elseif isDebugMode then
+			printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience.", character and character.DisplayName or "", char)
 		end
 	end
 end)
-
-local isDebugMode = Ext.IsDeveloperMode() == true
 
 Ext.RegisterOsirisListener("CharacterKilledBy", 3, "after", function(victim, attackOwner, attacker)
 	if isGameLevel and Ext.GetGameState() == "Running" then
@@ -243,6 +253,8 @@ Ext.RegisterOsirisListener("CharacterKilledBy", 3, "after", function(victim, att
 			if not b then
 				Ext.PrintError(err)
 			end
+		elseif isDebugMode then
+			printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience.", character and character.DisplayName or "", victim)
 		end
 	end
 end)
