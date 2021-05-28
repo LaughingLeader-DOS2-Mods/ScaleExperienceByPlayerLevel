@@ -227,9 +227,9 @@ end
 ---@param skipAlignmentCheck boolean|nil
 local function CanGrantExperience(character, skipAlignmentCheck)
 	if GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 1 or 
-	(CharacterIsInCombat(character.MyGuid) == 0 
-	and character.RootTemplate ~= nil 
-	and character.RootTemplate.DefaultState ~= 0) -- Dead is > 0
+	(character.RootTemplate 
+	and character.RootTemplate.DefaultState ~= 0 -- Dead is > 0
+	and not IsInCombatWithPlayer(character))
 	then
 		return false
 	end
