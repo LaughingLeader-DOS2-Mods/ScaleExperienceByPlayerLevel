@@ -154,7 +154,7 @@ function GrantPartyExperience(character, printDebug)
 		end
 
 		if printDebug then
-			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (%s) Gain at level (%s).", gain, xpLevel)
+			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (%s) Gain at level (%s). Dying character: (%s)[%s]", gain, xpLevel, character.DisplayName, character.MyGuid)
 		end
 
 		--local partyStructure,highestLevel = BuildPartyStructure()
@@ -168,15 +168,35 @@ function GrantPartyExperience(character, printDebug)
 	return false
 end
 
+local function GetCombatID(uuid)
+	local combatid = CombatGetIDForCharacter(uuid) or -1
+	if not combatid or combatid <= 0 then
+		local db = Osi.DB_CombatCharacters:Get(uuid, nil)
+		if db and #db > 0 then
+			combatid = db[1][2]
+		end
+	end
+	if not combatid or combatid <= 0 then
+		local db = Osi.DB_WasInCombat:Get(uuid, nil)
+		if db and #db > 0 then
+			combatid = db[1][2]
+		end
+	end
+	Ext.Print(uuid, combatid)
+	return combatid
+end
+
 ---@param character EsvCharacter
 local function IsInCombatWithPlayer(character, attackOwner)
-	if attackOwner ~= nil and CharacterIsPlayer(attackOwner) == 1 then
+	if attackOwner and CharacterIsPlayer(attackOwner) == 1 then
 		return true
 	end
-	local combatid = CombatGetIDForCharacter(character.MyGuid)
-	for i,db in pairs(Osi.DB_IsPlayer:Get(nil)) do
-		if CombatGetIDForCharacter(db) == combatid then
-			return true
+	local combatid = GetCombatID(character.MyGuid)
+	if combatid > 0 then
+		for i,db in pairs(Osi.DB_IsPlayer:Get(nil)) do
+			if GetCombatID(db[1]) == combatid then
+				return true
+			end
 		end
 	end
 	return false
@@ -204,9 +224,16 @@ local function IsHostileToPlayer(character)
 end
 
 ---@param character EsvCharacter
+---@param skipAlignmentCheck boolean|nil
 local function CanGrantExperience(character, skipAlignmentCheck)
-	return GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 0
-	and not character:HasTag("NO_RECORD") -- A corpse?
+	if GlobalGetFlag("LLXPSCALE_DeathExperienceDisabled") == 1 or 
+	(CharacterIsInCombat(character.MyGuid) == 0 
+	and character.RootTemplate ~= nil 
+	and character.RootTemplate.DefaultState ~= 0) -- Dead is > 0
+	then
+		return false
+	end
+	return not character:HasTag("NO_RECORD") -- A corpse?
 	and not character:HasTag("LLXPSCALE_DisableDeathExperience")
 	and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0
 	and not character.Resurrected
@@ -218,7 +245,6 @@ local function CanGrantExperience(character, skipAlignmentCheck)
 	and CharacterIsPartyFollower(character.MyGuid) == 0
 	and not character:HasTag("LeaderLib_Dummy")
 	and not character:HasTag("LEADERLIB_IGNORE")
-	and (character.RootTemplate ~= nil and character.RootTemplate.DefaultState == 0) -- Dead is > 0
 	--and not string.find(character.DisplayName, "Dead")
 	--and not string.find(character.DisplayName, "Corpse")
 	and (skipAlignmentCheck == true or IsHostileToPlayer(character))
@@ -231,16 +257,18 @@ Ext.RegisterOsirisListener("GameStarted", 2, "after", function(region, _)
 	isGameLevel = IsGameLevel(region) == 1
 end)
 
-Ext.RegisterOsirisListener("CharacterDied", 1, "after", function(char)
+Ext.RegisterOsirisListener("CharacterDied", 1, "before", function(char)
 	if isGameLevel and Ext.GetGameState() == "Running" then
 		local character = Ext.GetCharacter(char)
-		if character ~= nil and CanGrantExperience(character) then
+		if character ~= nil and CanGrantExperience(character) and IsInCombatWithPlayer(character) then
 			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, isDebugMode)
 			if not b then
 				Ext.PrintError(err)
 			end
 		elseif isDebugMode then
-			printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience.", character and character.DisplayName or "", char)
+			if CombatGetIDForCharacter(CharacterGetHostCharacter()) ~= 0 then
+				printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience. DefaultState(%s)", character and character.DisplayName or "", char, (character.RootTemplate and character.RootTemplate.DefaultState) or "?")
+			end
 		end
 	end
 end)
