@@ -133,6 +133,10 @@ function GrantPartyExperience(character, printDebug)
 	elseif gain ~= 0 then
 		gain = tonumber(gain)
 	end
+	if gain > 0 then
+		-- Apparently Larian subtracts the character gain by 1, so 6 (125xp) is really 5 (100xp). 1 becomes "Bone".
+		gain = gain - 1
+	end
 	if Mods.LeaderLib then
 		local settings = Mods.LeaderLib.SettingsManager.GetMod("d5e1b4bc-dc7b-43dc-8bd0-d9f2b5e3a418", false)
 		if settings then
