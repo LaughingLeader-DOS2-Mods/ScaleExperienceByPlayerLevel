@@ -138,7 +138,7 @@ function GrantPartyExperience(character, printDebug)
 		gain = gain - 1
 	end
 	if Mods.LeaderLib then
-		local settings = Mods.LeaderLib.SettingsManager.GetMod("d5e1b4bc-dc7b-43dc-8bd0-d9f2b5e3a418", false)
+		local settings = Mods.LeaderLib.SettingsManager.GetMod(ModuleUUID, false)
 		if settings then
 			local gainModifier = settings.Global:GetVariable("GainModifier", 1.0)
 			if gainModifier ~= 1.0 then
@@ -173,6 +173,9 @@ function GrantPartyExperience(character, printDebug)
 end
 
 local function GetCombatID(uuid)
+	if uuid == nil then
+		return nil
+	end
 	local combatid = CombatGetIDForCharacter(uuid) or -1
 	if not combatid or combatid <= 0 then
 		local db = Osi.DB_CombatCharacters:Get(uuid, nil)
@@ -269,7 +272,7 @@ Ext.RegisterOsirisListener("CharacterDied", 1, "before", function(char)
 			if not b then
 				Ext.PrintError(err)
 			end
-		elseif isDebugMode then
+		elseif isDebugMode and ObjectGetFlag(char, "LLXPSCALE_GrantedExperience") == 0 then
 			if CombatGetIDForCharacter(CharacterGetHostCharacter()) ~= 0 then
 				printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience. DefaultState(%s)", character and character.DisplayName or "", char, (character.RootTemplate and character.RootTemplate.DefaultState) or "?")
 			end
@@ -285,7 +288,7 @@ Ext.RegisterOsirisListener("CharacterKilledBy", 3, "after", function(victim, att
 			if not b then
 				Ext.PrintError(err)
 			end
-		elseif isDebugMode then
+		elseif isDebugMode and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0 then
 			printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience.", character and character.DisplayName or "", victim)
 		end
 	end
