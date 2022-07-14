@@ -1,1 +1,1 @@
-Ext.Utils.Include("Shared.lua")
+Ext.Require("Shared.lua")

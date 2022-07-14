@@ -1,4 +1,4 @@
-Ext.Utils.Include("Shared.lua")
+Ext.Require("Shared.lua")
 
 local _DEBUG = Ext.Debug.IsDeveloperMode() == true
 
