@@ -5,4 +5,5 @@ local function DisableGain()
 end
 
 Ext.Events.ModuleLoading:Subscribe(DisableGain)
-Ext.Events.ModuleResume:Subscribe(DisableGain)
+--TODO causes a crash in v56 as of 7/14/2022
+--Ext.Events.ModuleResume:Subscribe(DisableGain)
