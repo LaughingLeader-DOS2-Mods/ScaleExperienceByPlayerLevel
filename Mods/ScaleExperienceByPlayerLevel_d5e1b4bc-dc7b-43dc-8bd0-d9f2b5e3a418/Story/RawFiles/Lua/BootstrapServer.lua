@@ -1,114 +1,12 @@
-local function FlattenTable(tbl)
-	local result = { }
-		
-	local function flatten(tbl)
-		for _, v in ipairs(tbl) do
-			if type(v) == "table" then
-				flatten(v)
-			else
-				table.insert(result, v)
-			end
-		end
-	end
-	
-	flatten(tbl)
-	return result
-end
+Ext.Utils.Include("Shared.lua")
 
-local function PrintIndex(k, indexMap)
-	if indexMap ~= nil and type(indexMap) == "table" then
-		local displayValue = indexMap[k]
-		if displayValue ~= nil then
-			return displayValue
-		end
-	end
-	if type(k) == "string" then
-		return '"'..k..'"'
-	else
-		return tostring(k)
-	end
-end
+local _DEBUG = Ext.Debug.IsDeveloperMode() == true
 
----Print a value or table (recursive).
----@param o table
----@param indexMap table
----@param innerOnly boolean
----@return string
-local function DumpTable(o, indexMap, innerOnly, recursionLevel)
-	if recursionLevel == nil then recursionLevel = 0 end
-	if type(o) == 'table' then
-		local s = '{ '
-		for k,v in pairs(o) do
-			if innerOnly == true then
-				if recursionLevel > 0 then
-					s = s .. ' ['..PrintIndex(k, indexMap)..'] = ' .. DumpTable(v, indexMap, innerOnly, recursionLevel + 1) .. ','
-				else
-					s = s .. ' ['..PrintIndex(k, nil)..'] = ' .. DumpTable(v, indexMap, innerOnly, recursionLevel + 1) .. ','
-				end
-			else
-				s = s .. ' ['..PrintIndex(k, indexMap)..'] = ' .. DumpTable(v, indexMap, innerOnly, recursionLevel + 1) .. ','
-			end
-		end
-		return s .. '} \n'
-	else
-		return tostring(o)
-	end
-end
-
+local _format = string.format
 local function printd(msg, ...)
-	Ext.Print(string.format(msg, ...))
-end
-
-local function BuildPartyStructure(printDebug)
-	local players = FlattenTable(Osi.DB_IsPlayer:Get(nil))
-	local partyLeaders = {}
-	local highestLevel = 1
-
-	if printDebug then 
-		Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] Players: (".. DumpTable(players) ..").")
+	if _DEBUG then
+		Ext.Utils.Print(_format(msg, ...))
 	end
-
-	if #players == 1 then
-		local player = CharacterGetHostCharacter()
-		local level = CharacterGetLevel(player)
-		if printDebug then 
-			Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] Only one player ("..player..") at level ("..tostring(level)..")")
-		end
-		return player,level
-	end
-
-	local tableEmpty = true
-	for i,v in pairs(players) do
-		local level = CharacterGetLevel(v)
-		if level > highestLevel then highestLevel = level end
-		if tableEmpty then
-			if printDebug then 
-				Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] partyLeaders count is 0. Adding to table. ("..v..")")
-			end
-			partyLeaders[v] = {}
-			tableEmpty = false
-		else
-			for leader,members in pairs(partyLeaders) do
-				if v ~= leader then
-					if CharacterIsInPartyWith(leader, v) == 1 then
-						if printDebug then 
-							Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] (".. v ..") is in a party with ("..leader..")?")
-						end
-						members[#members+1] = v
-					else
-						if printDebug then 
-							Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] (".. v ..") is not in a party with ("..leader..")?")
-						end
-						partyLeaders[v] = {}
-					end
-				end
-			end
-		end
-	end
-	if printDebug then 
-		Ext.Print("[LLXPSCALE:BootstrapServer.lua:BuildPartyStructure] Party leader structure: (".. DumpTable(partyLeaders) ..").")
-	end
-	return partyLeaders,highestLevel
 end
 
 ---@return integer
@@ -127,7 +25,7 @@ end
 function GrantPartyExperience(character, printDebug)
 	ObjectSetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience", 0)
 	--print("GrantPartyExperience", character.MyGuid, character.Stats.Name)
-	local gain = Ext.StatGetAttribute(character.Stats.Name, "Gain") or 0
+	local gain = Ext.Stats.GetAttribute(character.Stats.Name, "Gain") or 0
 	if gain == "None" then
 		gain = 0
 	elseif gain ~= 0 then
@@ -142,7 +40,7 @@ function GrantPartyExperience(character, printDebug)
 		if settings then
 			local gainModifier = settings.Global:GetVariable("GainModifier", 1.0)
 			if gainModifier ~= 1.0 then
-				gain = Ext.Round((gain * gainModifier) + 0.25)
+				gain = Ext.Utils.Round((gain * gainModifier) + 0.25)
 			end
 		end
 	end
@@ -161,7 +59,6 @@ function GrantPartyExperience(character, printDebug)
 			printd("[LLXPSCALE:BootstrapServer.lua:LLXPSCALE_Ext_GrantExperience] Granting experience to all players scaled by (%s) Gain at level (%s). Dying character: (%s)[%s]", gain, xpLevel, character.DisplayName, character.MyGuid)
 		end
 
-		--local partyStructure,highestLevel = BuildPartyStructure()
 		local leader = CharacterGetHostCharacter()
 		PartyAddExperience(leader, 1, xpLevel, gain)
 	else
@@ -179,17 +76,16 @@ local function GetCombatID(uuid)
 	local combatid = CombatGetIDForCharacter(uuid) or -1
 	if not combatid or combatid <= 0 then
 		local db = Osi.DB_CombatCharacters:Get(uuid, nil)
-		if db and #db > 0 then
+		if db and db[1] then
 			combatid = db[1][2]
 		end
 	end
 	if not combatid or combatid <= 0 then
 		local db = Osi.DB_WasInCombat:Get(uuid, nil)
-		if db and #db > 0 then
+		if db and db[1] then
 			combatid = db[1][2]
 		end
 	end
-	Ext.Print(uuid, combatid)
 	return combatid
 end
 
@@ -208,13 +104,6 @@ local function IsInCombatWithPlayer(character, attackOwner)
 	end
 	return false
 end
-
--- Ext.RegisterOsirisListener("CharacterStatusApplied", 3, "after", function(char, status, source)
--- 	if status == "SUMMONING" then
--- 		local character = Ext.GetCharacter(char)
--- 		print(character.Summon, character.Stats.IsPlayer, character.IsPlayer, CharacterIsSummon(character.MyGuid))
--- 	end
--- end)
 
 ---@param character EsvCharacter
 local function IsHostileToPlayer(character)
@@ -258,21 +147,20 @@ local function CanGrantExperience(character, skipAlignmentCheck)
 end
 
 local isGameLevel = true
-local isDebugMode = Ext.IsDeveloperMode() == true
 
-Ext.RegisterOsirisListener("GameStarted", 2, "after", function(region, _)
+Ext.Osiris.RegisterListener("GameStarted", 2, "after", function(region, _)
 	isGameLevel = IsGameLevel(region) == 1
 end)
 
-Ext.RegisterOsirisListener("CharacterDied", 1, "before", function(char)
-	if isGameLevel and Ext.GetGameState() == "Running" then
+Ext.Osiris.RegisterListener("CharacterDied", 1, "before", function(char)
+	if isGameLevel and Ext.GetGameState() == "Running" and ObjectExists(char) == 1 then
 		local character = Ext.GetCharacter(char)
 		if character ~= nil and CanGrantExperience(character) and IsInCombatWithPlayer(character) then
-			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, isDebugMode)
+			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, _DEBUG)
 			if not b then
 				Ext.PrintError(err)
 			end
-		elseif isDebugMode and ObjectGetFlag(char, "LLXPSCALE_GrantedExperience") == 0 then
+		elseif _DEBUG and ObjectGetFlag(char, "LLXPSCALE_GrantedExperience") == 0 then
 			if CombatGetIDForCharacter(CharacterGetHostCharacter()) ~= 0 then
 				printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience. DefaultState(%s)", character and character.DisplayName or "", char, (character.RootTemplate and character.RootTemplate.DefaultState) or "?")
 			end
@@ -280,15 +168,15 @@ Ext.RegisterOsirisListener("CharacterDied", 1, "before", function(char)
 	end
 end)
 
-Ext.RegisterOsirisListener("CharacterKilledBy", 3, "after", function(victim, attackOwner, attacker)
-	if isGameLevel and Ext.GetGameState() == "Running" then
-		local character = Ext.GetCharacter(victim)
+Ext.Osiris.RegisterListener("CharacterKilledBy", 3, "after", function(victim, attackOwner, attacker)
+	if isGameLevel and Ext.GetGameState() == "Running" and ObjectExists(victim) == 1 then
+		local character = Ext.Entity.GetCharacter(victim)
 		if character ~= nil and CanGrantExperience(character, true) and IsInCombatWithPlayer(character, attackOwner) then
-			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, isDebugMode)
+			local b,err = xpcall(GrantPartyExperience, debug.traceback, character, _DEBUG)
 			if not b then
-				Ext.PrintError(err)
+				Ext.Utils.PrintError(err)
 			end
-		elseif isDebugMode and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0 then
+		elseif _DEBUG and ObjectGetFlag(character.MyGuid, "LLXPSCALE_GrantedExperience") == 0 then
 			printd("[LLXPSCALE:CharacterDied] Character (%s)[%s] can't grant experience.", character and character.DisplayName or "", victim)
 		end
 	end
