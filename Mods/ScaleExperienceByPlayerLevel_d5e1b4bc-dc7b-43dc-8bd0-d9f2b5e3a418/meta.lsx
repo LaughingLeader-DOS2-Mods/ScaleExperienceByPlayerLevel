@@ -10,8 +10,8 @@
                     <attribute id="Author" value="LaughingLeader" type="30" />
                     <attribute id="CharacterCreationLevelName" value="" type="22" />
                     <attribute id="Description" value="Scales higher level enemy death experience to the level of the highest player, allowing you to use enemy level scaling mods without worry of leveling up too fast. Lower level enemies still use their level for the xp granted to the party." type="30" />
-                    <attribute id="DescriptionName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
-                    <attribute id="DisplayName" value="" handle="ls::TranslatedStringRepository::s_HandleUnknown" type="28" />
+                    <attribute id="DescriptionName" value="" handle="h9942c2a6g263ag410dg8a9cgf94a962683fa" type="28" />
+                    <attribute id="DisplayName" value="Scale Experience By Player Level" handle="h2f5838fdg0445g4125ga039g79ee5dfa13f2" type="28" />
                     <attribute id="Folder" value="ScaleExperienceByPlayerLevel_d5e1b4bc-dc7b-43dc-8bd0-d9f2b5e3a418" type="30" />
                     <attribute id="GMTemplate" value="" type="22" />
                     <attribute id="LobbyLevelName" value="" type="22" />

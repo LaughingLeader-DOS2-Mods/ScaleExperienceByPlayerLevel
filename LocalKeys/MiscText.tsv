@@ -1,0 +1,4 @@
+Key	Content	Handle
+LLSCALEXP_MissingScriptExtender	<font color='#FF0000'>Scale XP By Player Level *ERROR*</font><font color='#FF00CC'>The Script Extender is needed for this mod to work properly, and it is currently not detected.</font><br>Please check the mod page for details on how to install the script extender.	habb8d229gd459g4db7gae25g00429ecc9a74
+LLSCALEXP_DisplayName	Scale Experience by Player Level	h2f5838fdg0445g4125ga039g79ee5dfa13f2
+LLSCALEXP_Description	Scales higher level enemy death experience to the level of the highest player, allowing you to use enemy level scaling mods without worry of leveling up too fast. Lower level enemies still use their level for the xp granted to the party.	h9942c2a6g263ag410dg8a9cgf94a962683fa

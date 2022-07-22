@@ -2,10 +2,12 @@
 	<content contentuid="h1b4e0b43g5a88g4818g9a41gbd57e74e2191">If enabled, dying characters will grant xp regardless of their alignment, meaning killing a neutral character immediately will grant experience.&lt;br&gt;(Default: Disabled)</content>
 	<content contentuid="h1d90a48bgf934g40bdg89e8gf727baf1ca26">Ignore Alignments</content>
 	<content contentuid="h2837a69bgf20cg4080g81d2g51b5b5d65371">A number to multiply experience gain by. The average Gain value may be anywhere from 1-3. The final Gain value will be rounded to the greater whole number (ex. 1 times 0.5 will be 1, 7 times 0.5 will be 4).&lt;br&gt;(Default: 1) </content>
+	<content contentuid="h5c0e9815gd6ecg42ccg947dgd2308c2bf2bd">Scale Experience by Player Level</content>
 	<content contentuid="h6a30a1a3gced7g4033gaf36g1e2826cc78b6">Character Gain Modifier</content>
 	<content contentuid="h6d2d607cgcc5cg486egb395g53f51095eac1">Enable Death Experience</content>
 	<content contentuid="h85a1e79bg59f0g4b8fga6begca12641a342b">Characters who have never been resurrected before will grant experience when they die. Disable this to effectively disable this mod.&lt;br&gt;(Default: Enabled)</content>
 	<content contentuid="h935865a5g9f0eg475ag85bdg699df269f8d7">Always Scale to Player Level</content>
 	<content contentuid="habb8d229gd459g4db7gae25g00429ecc9a74">&lt;font color=&apos;#FF0000&apos;&gt;Scale XP By Player Level *ERROR*&lt;/font&gt;&lt;font color=&apos;#FF00CC&apos;&gt;The Script Extender is needed for this mod to work properly, and it is currently not detected.&lt;/font&gt;&lt;br&gt;Please check the mod page for details on how to install the script extender.</content>
+	<content contentuid="hbda3ef24gb214g40e7g9a30ge016f9afa68b">Scales higher level enemy death experience to the level of the highest player, allowing you to use enemy level scaling mods without worry of leveling up too fast. Lower level enemies still use their level for the xp granted to the party.</content>
 	<content contentuid="he3e5bbe3g8009g4a33g9558gffcbe3d0107a">By default, if an enemy level is lower than the party&apos;s level, xp will scale to that enemy&apos;s level. If this is disabled, the level used will always be the party&apos;s highest level.&lt;br&gt;(Default: Disabled)</content>
 </contentList>

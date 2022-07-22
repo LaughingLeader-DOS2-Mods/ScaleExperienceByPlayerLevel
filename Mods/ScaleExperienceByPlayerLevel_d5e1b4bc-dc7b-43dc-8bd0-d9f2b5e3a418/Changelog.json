@@ -1,0 +1,24 @@
+{
+	"DisplayName": "[Key:LLSCALEXP_DisplayName:Scale Experience by Player Level]",
+	"Description": "[Key:LLSCALEXP_Description:Scales higher level enemy death experience to the level of the highest player, allowing you to use enemy level scaling mods without worry of leveling up too fast. Lower level enemies still use their level for the xp granted to the party.]",
+	"Entries": [
+		{
+			"Version": "1.0.8.1",
+			"Changes": [
+				"Added changelog text to the journal, if LeaderLib is active."
+			]
+		},
+		{
+			"Version": "1.0.8.0",
+			"Changes": [
+				"Re-enabled death experience formula changes, thanks to a fix in an extender update."
+			]
+		},
+		{
+			"Version": "1.0.7.2",
+			"Changes": [
+				"Fix death XP calculation (level 1 voidlings should be 100 xp, like it is normally)."
+			]
+		}
+	]
+}
